@@ -2,10 +2,10 @@ from class_token import *
 from class_useful_objects import *
 
 
-def inter(instruction, dico_function):
+def inter(instruction, pile, dico_function):
     instr=Instruction(instruction)
     tab_instruction=instr.split_instruction()
-    pile=Stack([])
+    
     L=[]
     for i in range(len(tab_instruction)):
         if tab_instruction[i]!="{" and tab_instruction[i]!="}":
@@ -32,12 +32,13 @@ def conv_procedure(liste):
 dico_function={}
 instruction=input(">>>")
 liste=[]
-pile=[]
+"""pile=[]"""
+pile=Stack([])
 while instruction!="exit":
-    liste=inter(instruction, dico_function)
+    liste=inter(instruction, pile, dico_function)
+    pile=liste[0]
     print(liste[0].print_stack())
     dico_function=liste[1]
-    print(dico_function)
     instruction=input(">>>")
 
 
