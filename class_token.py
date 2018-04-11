@@ -7,25 +7,26 @@ class Token:
     pass
 
 class OperateurUnitaire(Token):
-    """Classe des opérateurs unitaires, comportement: empile"""
+    """Classe des opérateurs unitaires (nombre entier, booléen)"""
 
     def __init__(self, string):
         self.string=string
 
     def operation(self, stack, i=0, dico_function={}):
-        """Réalise le comportement d'un operateur unitaire"""
+        """Réalise le comportement d'un operateur unitaire: il est directement empilé"""
         stack.append(self)
         return stack, dico_function
 
 
 class OperateurBinaire(Token):
-    """Classe des opérateurs binaires, comportement: dépile, dépile, appel à la méthode opération, empile"""
+    """Classe des opérateurs binaires (tous ceux qui nécessitent l'utilisation des deux derniers élémenst de la pile)"""
 
     def __init__(self, string):
         self.string=string
 
     def operation(self, stack, i=0, dico_function={}):
-        """Réalise le comportement d'un operateur binaire"""
+        """Réalise le comportement d'un operateur binaire: dépile les deux derniers éléments 
+        et effectue l'opération associée en fonction de cet opérateur, puis rempile le résultat"""
         terms=stack.pop(2)
         if self.string=="add":
             stack.append(get_type(int(terms[0].string)+int(terms[1].string)))
@@ -65,13 +66,18 @@ class OperateurBinaire(Token):
                 stack.append(get_type("true"))
             else:
                 stack.append(get_type("false"))
+        elif self.string=="def":
+            """Opérateur binaire qui récupère le nom et la procédure définis et crée une nouvelle entrée dans le dictionnaire des fonctions"""
+            dico_function[terms[0].lstrip("/")]=terms[1]
         elif self.string=="if": 
             if terms[0].string=="true": 
                 """On regarde si la procédure indiquée est vide"""
                 if len(terms[1].liste)==0:
-                    """La procédure est-elle vide ?"""
+                    """Si elle est vide on ne fait rien"""
                     pass
                 else:
+                    """Si elle n'est pas vide, on ajoute les éléments de la liste procédure dans notre pile et effectue les opérations asscociées, 
+                    grâce à la fonction intermédiaire inter_list_partielle, en considérant cette nouvelle pile comme une liste d'instruction"""
                     for i in range(len(terms[1].liste)):
                         stack.append(terms[1].liste[i])
                     liste=inter_list_partielle(stack, dico_function)
@@ -86,13 +92,14 @@ class OperateurBinaire(Token):
 
 
 class OperateurTernaire(Token):
-    """Classe des opérateurs ternaires, comportement: dépile, dépile, dépile, appel à la méthode opération, empile"""
+    """Classe des opérateurs ternaires (tous ceux qui nécessitent l'utilisation des trois derniers élémenst de la pile)"""
 
     def __init__(self, string):
         self.string=string 
 
     def operation(self, stack, i=0, dico_function={}):
-        """Réalise le comportement d'un operateur ternaire"""
+        """Réalise le comportement d'un operateur ternaire: dépile les trois derniers éléments 
+        et effectue l'opération associée en fonction de cet opérateur, puis rempile le résultat"""
         terms=stack.pop(3)
         if self.string=="ifelse":
             if terms[0].string=="true": 
@@ -100,6 +107,8 @@ class OperateurTernaire(Token):
                     """La procédure est-elle vide ?"""
                     pass
                 else:
+                    """Si elle n'est pas vide, on ajoute les éléments de la liste procédure dans notre pile et effectue les opérations asscociées, 
+                    grâce à la fonction intermédiaire inter_list_partielle, en considérant cette nouvelle pile comme une liste d'instruction"""
                     for i in range(len(terms[1].liste)):
                         stack.append(terms[1].liste[i])
                     liste=inter_list_partielle(stack, dico_function)
@@ -109,6 +118,8 @@ class OperateurTernaire(Token):
                     """La procédure est-elle vide ?"""
                     pass
                 else:
+                    """Si elle n'est pas vide, on ajoute les éléments de la liste procédure dans notre pile et effectue les opérations asscociées, 
+                    grâce à la fonction intermédiaire inter_list_partielle, en considérant cette nouvelle pile comme une liste d'instruction"""
                     for i in range(len(terms[2].liste)):
                         stack.append(terms[2].liste[i])
                     liste=inter_list_partielle(stack, dico_function)
@@ -119,24 +130,30 @@ class OperateurTernaire(Token):
 
 
 class OperateurQuaternaire(Token):
-    """Classe des opérateurs quaternaires, comportement: dépile, dépile, dépile, dépile, appel à la méthode opération, empile"""
+    """Classe des opérateurs quaternaires (tous ceux qui nécessitent l'utilisation des deux derniers élémenst de la pile)"""
 
     def __init__(self, string):
         self.string=string
 
     def operation(self, stack, i=0, dico_function={}):
-        """Réalise le comportement d'un operateur quaternaire"""
+        """Réalise le comportement d'un operateur quaternaire: dépile les quatre derniers éléments 
+        et effectue l'opération associée en fonction de cet opérateur, puis rempile le résultat"""
         terms=stack.pop(4)
         if self.string=="for":
             if len(terms[3].liste)==0:
                 """La procédure est-elle vide ?"""
                 for i in range(int(terms[0].string),int(terms[2].string)+1,int(terms[1].string)):
+                    """Dans le cas d'une procédure vide, on ajoute un à un les éléments compris entre les bornes de notre boucle, en fonction du pas"""
                     stack.append(get_type(i))
             else:
                 for i in range(int(terms[0].string),int(terms[2].string)+1,int(terms[1].string)):
+                    """Si la procédure n'est pas vide, on ajoute le premier élément de la boucle for, 
+                    on ajoute la procédure, on effectue l'opération associée.
+                    On recommence pour chaque élémént de la boucle, jusqu'à atteindre la borne de fin, en tenant compte du pas"""
                     stack.append(get_type(i))
                     for i in range(len(terms[3].liste)):
                         stack.append(terms[3].liste[i])
+                    """Utilisation de la fonction intermédiaire inter_list_partielle qui permet de gérer les procédures"""
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
         else:
@@ -145,15 +162,19 @@ class OperateurQuaternaire(Token):
 
 
 class Name(Token):
+    """Classe des noms, utilisés dans la définition de foncton ou dans l'appel à une fonction"""
 
     def __init__(self, string, i=0, dico_function={}):
         self.string=string
 
     def operation(self, stack, i=0, dico_function={}):
         if self.string[0]=="/":
+            """Si le nom est précédé du caractère "/" c'est qu'il sert à définir une foction, auquel cas on l'empile simplement"""
             stack.append(self.string)
         else:
             if dico_function.get(self.string)!=None:
+                """Si le nom est bien présnet dans le dictionnaire des fonctions, 
+                on appelle la fonction associée et exécute la procédure associée avec la fonction intermédiaire inter_list_partielle"""
                 procedure=dico_function[self.string]
                 for i in range(len(procedure.liste)):
                     stack.append(procedure.liste[i])
@@ -165,29 +186,19 @@ class Name(Token):
 
 
 class Procedure(Token):
+    """Classe des procédures: objet composite dont l'attribut est une liste d'objets de type d'une classe fille de la classe Token"""
 
     def __init__(self, liste):
         self.liste=liste
 
     def operation(self, stack, i=0, dico_function={}):
-        """Réalise le comportement d'une procédure"""
+        """Réalise le comportement d'une procédure: on l'empile"""
         stack.append(self)
         return stack, dico_function
 
 
-class Def(Token):
-
-    def __init__(self, string, i=0, dico_function={}):
-        self.string=string
-
-    def operation(self, stack, i=0, dico_function={}):
-        """Réalise le comportement d'une procédure"""
-        terms=stack.pop(2)
-        dico_function[terms[0].lstrip("/")]=terms[1]
-        return stack, dico_function
-
-
 class Dup(Token):
+    """Classe de l'objet permettant l'appel à la méthode de la classe Stack pour dupliquer le dernier objet de la pile."""
 
     def __init__(self, string, i=0, dico_function={}):
         self.string=string
@@ -198,6 +209,7 @@ class Dup(Token):
 
 
 class Exch(Token):
+    """Classe de l'objet permettant l'appel à la méthode de la classe Stack pour échanger les deux derniers objets de la pile."""
 
     def __init__(self, string, i=0, dico_function={}):
         self.string=string
@@ -208,6 +220,7 @@ class Exch(Token):
 
 
 class Pop(Token):
+    """Classe de l'objet permettant l'appel à la méthode de la classe Stack pour supprimer le dernier objet de la pile."""
 
     def __init__(self, string, i=0, dico_function={}):
         self.string=string
@@ -218,6 +231,7 @@ class Pop(Token):
 
 
 def get_type(token):
+    """Fonction permettant de reconnaitre pour un token (sous forme de chaine de caractère) sa classe associée et de le transtyper"""
     if token in ["true","false"]:
         token=OperateurUnitaire(token)
         return token
@@ -228,7 +242,7 @@ def get_type(token):
             return token
         except:
             pass
-    elif token in ["add","sub", "mul", "idiv", "eq", "ne", "lt", "le", "gt", "ge", "if"]:
+    elif token in ["add","sub", "mul", "idiv", "eq", "ne", "lt", "le", "gt", "ge", "def", "if"]:
         token=OperateurBinaire(token)
         return token
     elif token in ["ifelse"]:
@@ -261,6 +275,8 @@ def get_type(token):
     
 
 def inter_list_partielle(stack, dico_function):
+    """Fonction intermédiaire indispensable dans la gestion des procédures.
+    La pile actuelle devient une liste d'instruction qui va être lue comme si elle était issue d'une instruction entrée par l'utilisateur"""
     tab_instruction=stack.liste
     n=len(tab_instruction)
     pile=Stack([])
