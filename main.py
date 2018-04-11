@@ -39,15 +39,30 @@ def conv_procedure(liste):
     return liste
 
 
-"""Programme principal: à chaque instruction entrée, l'opération souhaitée s'exécute. La pile reste la même. 
-Il est nécessaire de relancer le programme pour avoir une nouvelle pile. Les ">>>" signifient que c'est à l'utilisateur d'écrire"""
-dico_function={}
-instruction=input(">>>")
-liste=[]
-pile=Stack([])
-while instruction!="exit":
-    liste=inter(instruction, pile, dico_function)
-    pile=liste[0]
-    print(liste[0].print_stack())
-    dico_function=liste[1]
+
+def main():
+    """Programme principal: à chaque instruction entrée, l'opération souhaitée s'exécute. La pile reste la même. 
+    Il est nécessaire de relancer le programme pour avoir une nouvelle pile. Les ">>>" signifient que c'est à l'utilisateur d'écrire.
+    Si l'on veut réinitialiser la pile, il suffit d'entrer l'instruction "clear". Le dictionnaire des fonctions est aussi réinitialisé"""
+    dico_function={}
     instruction=input(">>>")
+    liste=[]
+    pile=Stack([])
+    while instruction!="exit" and instruction !="clear":
+        liste=inter(instruction, pile, dico_function)
+        pile=liste[0]
+        print(liste[0].print_stack())
+        dico_function=liste[1]
+        instruction=input(">>>")
+    if instruction=="clear":
+        """On utilise la récursion pour relancer le programme avec une pile vide"""
+        main()
+
+
+"""On exécute le programme"""
+main()
+
+
+
+
+
