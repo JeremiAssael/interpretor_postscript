@@ -30,7 +30,7 @@ class OperateurBinaire(Token):
         if self.string=="add":
             stack.append(get_type(int(terms[0].string)+int(terms[1].string)))
         elif self.string=="sub":
-            stack.append(get_type(int(terms[0].string)+int(terms[1].string)))
+            stack.append(get_type(int(terms[0].string)-int(terms[1].string)))
         elif self.string=="mul":
             stack.append(get_type(int(terms[0].string)*int(terms[1].string)))
         elif self.string=="idiv":
@@ -74,7 +74,6 @@ class OperateurBinaire(Token):
                 else:
                     for i in range(len(terms[1].liste)):
                         stack.append(terms[1].liste[i])
-                        print(stack.liste)
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
             elif terms[0].string=="false":
@@ -103,7 +102,6 @@ class OperateurTernaire(Token):
                 else:
                     for i in range(len(terms[1].liste)):
                         stack.append(terms[1].liste[i])
-                        print(stack.liste)
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
             elif terms[0].string=="false":
@@ -113,7 +111,6 @@ class OperateurTernaire(Token):
                 else:
                     for i in range(len(terms[2].liste)):
                         stack.append(terms[2].liste[i])
-                        print(stack.liste)
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
             else:
@@ -234,7 +231,7 @@ def get_type(token):
     if token in ["true","false"]:
         token=OperateurUnitaire(token)
         return token
-    elif re.search("^\d*[.,]?\d*$",str(token))!=None:
+    elif re.search("^[-]?\d*$",str(token))!=None:
         try:
             b=int(token)
             token=OperateurUnitaire(token)
