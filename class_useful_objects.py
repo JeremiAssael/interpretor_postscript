@@ -74,9 +74,6 @@ class Instruction():
                 self.instruction=self.instruction[0:i+1]+" "+self.instruction[i+1:len(self.instruction)+1]
         nb2=self.instruction.count("(\S)?}")
         for i in range(len(self.instruction)+nb2):
-            print(self.instruction)
-            print(i)
-            print(len(self.instruction))
             if self.instruction[i]=="}" and not re.match(" ",self.instruction[i-1]) and not re.match("{",self.instruction[i-2]):
                 self.instruction=self.instruction[0:i]+" "+self.instruction[i:len(self.instruction)+1]
             elif self.instruction[i]=="}" and re.match(" ",self.instruction[i-1]) and re.match("{",self.instruction[i-2]):
