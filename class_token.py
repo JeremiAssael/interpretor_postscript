@@ -182,11 +182,8 @@ class Def(Token):
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'une procédure"""
-        if re.search("^(/)\w*$",get_previous_token(stack,i-1))!=None and type(get_previous_token(stack,i)) is Procedure:
-            dico_function[get_previous_token(stack,i-1).lstrip("/")]=get_previous_token(stack,i)
-            stack.pop(2)
-        else:
-            pass
+        terms=stack.pop(2)
+        dico_function[terms[0].lstrip("/")]=terms[1]
         return stack, dico_function
 
 
@@ -218,13 +215,6 @@ class Pop(Token):
     def operation(self, stack, i=0, dico_function={}):
         stack.pop_element()
         return stack, dico_function
-
-def get_previous_token(instruc_stack, old_token_index=-1):
-    try:
-        previous_one=instruc_stack.liste[old_token_index-1]
-        return previous_one
-    except:
-        print("Syntax error: no function to define")
 
 
 def get_type(token):
