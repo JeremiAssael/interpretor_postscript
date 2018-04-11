@@ -14,16 +14,7 @@ class OperateurUnitaire(Token):
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'un operateur unitaire"""
-        b=0
-        try:
-            b=int(self.string)
-            stack.append(b)
-        except:
-            if self.string=="true":
-                b="true"
-            else:
-                b="false"
-            stack.append(b)
+        stack.append(self)
         return stack, dico_function
 
 
@@ -31,72 +22,62 @@ class OperateurBinaire(Token):
     """Classe des opérateurs binaires, comportement: dépile, dépile, appel à la méthode opération, empile"""
 
     def __init__(self, string):
-        self._associated_number=2
         self.string=string
-
-    def _get_associated_number(self):
-        """Méthode permettant d'accéder au nombre caractéristique de cette classe. L'utilisation de propriétés permet de ne pas modifier cette attribut"""
-        return self._associated_number
-
-    associated_number=property(_get_associated_number)
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'un operateur binaire"""
-        terms=stack.pop(self.associated_number)
+        terms=stack.pop(2)
         if self.string=="add":
-            stack.append(terms[0]+terms[1])
+            stack.append(get_type(int(terms[0].string)+int(terms[1].string)))
         elif self.string=="sub":
-            stack.append(terms[0]-terms[1])
+            stack.append(get_type(int(terms[0].string)+int(terms[1].string)))
         elif self.string=="mul":
-            stack.append(terms[0]*terms[1])
+            stack.append(get_type(int(terms[0].string)*int(terms[1].string)))
         elif self.string=="idiv":
-            stack.append(terms[0]//terms[1])
+            stack.append(get_type(int(terms[0].string)//int(terms[1].string)))
         elif self.string=="eq":
-            if terms[0]==terms[1]:
-                stack.append("true")
+            if int(terms[0].string)==int(terms[1].string):
+                stack.append(get_type("true"))
             else:
-                stack.append("false")
+                stack.append(get_type("false"))
         elif self.string=="ne":
-            if terms[0]!=terms[1]:
-                stack.append("true")
+            if int(terms[0].string)!=int(terms[1].string):
+                stack.append(get_type("true"))
             else:
-                stack.append("false")
+                stack.append(get_type("false"))
         elif self.string=="lt":
-            if terms[0]<terms[1]:
-                stack.append("true")
+            if int(terms[0].string)<int(terms[1].string):
+                stack.append(get_type("true"))
             else:
-                stack.append("false")
+                stack.append(get_type("false"))
         elif self.string=="le":
-            if terms[0]<=terms[1]:
-                stack.append("true")
+            if int(terms[0].string)<=int(terms[1].string):
+                stack.append(get_type("true"))
             else:
-                stack.append("false")
+                stack.append(get_type("false"))
         elif self.string=="gt":
-            if terms[0]>terms[1]:
-                stack.append("true")
+            if int(terms[0].string)>int(terms[1].string):
+                stack.append(get_type("true"))
             else:
-                stack.append("false")
+                stack.append(get_type("false"))
         elif self.string=="ge":
-            if terms[0]>=terms[1]:
-                stack.append("true")
+            if int(terms[0].string)>=int(terms[1].string):
+                stack.append(get_type("true"))
             else:
-                stack.append("false")
+                stack.append(get_type("false"))
         elif self.string=="if": 
-            if terms[0]=="true": 
+            if terms[0].string=="true": 
                 """On regarde si la procédure indiquée est vide"""
-                if re.match("({)\s*?(})",terms[1]):
+                if len(terms[1].liste)==0:
                     """La procédure est-elle vide ?"""
                     pass
                 else:
-                    procedure=terms[1].lstrip("{")
-                    procedure=procedure.rstrip("}")
-                    procedure=Instruction(procedure)
-                    procedure=procedure.split_instruction()
-                    for i in range(len(procedure)):
-                        stack.append(procedure[i])
+                    for i in range(len(terms[1].liste)):
+                        stack.append(terms[1].liste[i])
+                        print(stack.liste)
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
-            elif terms[0]=="false":
+            elif terms[0].string=="false":
                 pass
             else:
                 print("Syntax error: if lacks a term")
@@ -109,43 +90,30 @@ class OperateurTernaire(Token):
     """Classe des opérateurs ternaires, comportement: dépile, dépile, dépile, appel à la méthode opération, empile"""
 
     def __init__(self, string):
-        self._associated_number=3
-        self.string=string
-
-    def _get_associated_number(self):
-        """Méthode permettant d'accéder au nombre caractéristique de cette classe. L'utilisation de propriétés permet de ne pas modifier cette attribut"""
-        return self._associated_number
-
-    associated_number=property(_get_associated_number)
+        self.string=string 
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'un operateur ternaire"""
-        terms=stack.pop(self.associated_number)
+        terms=stack.pop(3)
         if self.string=="ifelse":
-            if terms[0]=="true": 
-                if re.match("({)\s*?(})",terms[1]):
+            if terms[0].string=="true": 
+                if len(terms[1].liste)==0:
                     """La procédure est-elle vide ?"""
                     pass
                 else:
-                    procedure=terms[1].lstrip("{")
-                    procedure=procedure.rstrip("}")
-                    procedure=Instruction(procedure)
-                    procedure=procedure.split_instruction()
-                    for i in range(len(procedure)):
-                        stack.append(procedure[i])
+                    for i in range(len(terms[1].liste)):
+                        stack.append(terms[1].liste[i])
+                        print(stack.liste)
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
-            elif terms[0]=="false":
-                if re.match("({)\s*?(})",terms[2]):
+            elif terms[0].string=="false":
+                if len(terms[2].liste)==0:
                     """La procédure est-elle vide ?"""
                     pass
                 else:
-                    procedure=terms[2].lstrip("{")
-                    procedure=procedure.rstrip("}")
-                    procedure=Instruction(procedure)
-                    procedure=procedure.split_instruction()
-                    for i in range(len(procedure)):
-                        stack.append(procedure[i])
+                    for i in range(len(terms[2].liste)):
+                        stack.append(terms[2].liste[i])
+                        print(stack.liste)
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
             else:
@@ -157,32 +125,21 @@ class OperateurQuaternaire(Token):
     """Classe des opérateurs quaternaires, comportement: dépile, dépile, dépile, dépile, appel à la méthode opération, empile"""
 
     def __init__(self, string):
-        self._associated_number=4
         self.string=string
-
-    def _get_associated_number(self):
-        """Méthode permettant d'accéder au nombre caractéristique de cette classe. L'utilisation de propriétés permet de ne pas modifier cette attribut"""
-        return self._associated_number
-
-    associated_number=property(_get_associated_number)
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'un operateur quaternaire"""
-        terms=stack.pop(self.associated_number)
+        terms=stack.pop(4)
         if self.string=="for":
-            if re.match("({)\s*?(})",terms[3]):
+            if len(terms[3].liste)==0:
                 """La procédure est-elle vide ?"""
-                for i in range(terms[0],terms[2]+1,terms[1]):
-                    stack.append(i)
+                for i in range(int(terms[0].string),int(terms[2].string)+1,int(terms[1].string)):
+                    stack.append(get_type(i))
             else:
-                for i in range(terms[0],terms[2]+1,terms[1]):
-                    stack.append(i)
-                    procedure=terms[3].lstrip("{")
-                    procedure=procedure.rstrip("}")
-                    procedure=Instruction(procedure)
-                    procedure=procedure.split_instruction()
-                    for i in range(len(procedure)):
-                        stack.append(procedure[i])
+                for i in range(int(terms[0].string),int(terms[2].string)+1,int(terms[1].string)):
+                    stack.append(get_type(i))
+                    for i in range(len(terms[3].liste)):
+                        stack.append(terms[3].liste[i])
                     liste=inter_list_partielle(stack, dico_function)
                     stack=Stack(liste[0])
         else:
@@ -201,12 +158,8 @@ class Name(Token):
         else:
             if dico_function.get(self.string)!=None:
                 procedure=dico_function[self.string]
-                procedure=procedure.lstrip("{")
-                procedure=procedure.rstrip("}")
-                procedure=Instruction(procedure)
-                procedure=procedure.split_instruction()
-                for i in range(len(procedure)):
-                    stack.append(procedure[i])
+                for i in range(len(procedure.liste)):
+                    stack.append(procedure.liste[i])
                 liste=inter_list_partielle(stack, dico_function)
                 stack=Stack(liste[0])
             else:
@@ -216,12 +169,12 @@ class Name(Token):
 
 class Procedure(Token):
 
-    def __init__(self, string):
-        self.string=string
+    def __init__(self, liste):
+        self.liste=liste
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'une procédure"""
-        stack.append(self.string)
+        stack.append(self)
         return stack, dico_function
 
 
@@ -232,7 +185,7 @@ class Def(Token):
 
     def operation(self, stack, i=0, dico_function={}):
         """Réalise le comportement d'une procédure"""
-        if re.search("^(/)\w*$",get_previous_token(stack,i-1))!=None and get_previous_token(stack,i)[0]=="{":
+        if re.search("^(/)\w*$",get_previous_token(stack,i-1))!=None and type(get_previous_token(stack,i)) is Procedure:
             dico_function[get_previous_token(stack,i-1).lstrip("/")]=get_previous_token(stack,i)
             stack.pop(2)
         else:
@@ -309,9 +262,6 @@ def get_type(token):
     elif token in ["pop"]:
         token=Pop(token)
         return token
-    elif token[0]=="{":
-        token=Procedure(token)
-        return token
     elif token[0]=="/" and re.search("^\w*$",token[1:])!=None:
         token=Name(token)
         return token
@@ -322,14 +272,13 @@ def get_type(token):
         print("Syntax error: terms not recognized")
 
     
-    
+
 def inter_list_partielle(stack, dico_function):
     tab_instruction=stack.liste
     n=len(tab_instruction)
     pile=Stack([])
     L=[]
     for i in range(n):
-        tab_instruction[i]=get_type(tab_instruction[i])
         pile, dico_function=tab_instruction[i].operation(pile, i, dico_function)
     L.append(pile.liste)
     L.append(dico_function)
