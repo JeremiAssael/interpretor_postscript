@@ -15,7 +15,6 @@ def inter(instruction, dico_function):
     tab_instruction=conv_procedure(tab_instruction)
     for i in range(len(tab_instruction)):
         pile, dico_function=tab_instruction[i].operation(pile, i, dico_function)
-        print(pile.liste)
     L.append(pile)
     L.append(dico_function)
     return L
