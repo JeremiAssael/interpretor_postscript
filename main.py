@@ -23,7 +23,6 @@ def inter(instruction, dico_function):
 def conv_procedure(liste):
     for i in range(len(liste)):
         if type(liste[i]) is list:
-            print(liste[i])
             conv_procedure(liste[i])
             liste[i]=Procedure(liste[i])
     return liste
